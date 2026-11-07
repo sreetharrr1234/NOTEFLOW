@@ -1,0 +1,30 @@
+{
+  "name": "noteflow",
+  "version": "1.0.4",
+  "private": true,
+  "description": "NoteFlow — a local-first notes app for web and Android.",
+  "type": "commonjs",
+  "scripts": {
+    "serve": "python -m http.server 8000",
+    "web:copy": "node scripts/copy-web.js",
+    "cap:add": "npm run web:copy && cap add android",
+    "cap:sync": "npm run web:copy && cap sync android",
+    "cap:open": "cap open android",
+    "android:debug": "cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/share": "^8.0.3",
+    "@capacitor/status-bar": "^8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

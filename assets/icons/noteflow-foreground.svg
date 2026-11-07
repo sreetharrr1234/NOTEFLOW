@@ -1,0 +1,56 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">NoteFlow adaptive icon foreground</title>
+  <desc id="desc">Original open notebook with a glowing violet shadow-eye emblem for the adaptive launcher icon.</desc>
+  <defs>
+    <linearGradient id="nf-page" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#181322"/>
+      <stop offset="55%" stop-color="#110D1B"/>
+      <stop offset="100%" stop-color="#08060f"/>
+    </linearGradient>
+    <linearGradient id="nf-edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f2efff"/>
+      <stop offset="48%" stop-color="#8f83b8"/>
+      <stop offset="100%" stop-color="#f2efff"/>
+    </linearGradient>
+    <radialGradient id="nf-eye" cx="50%" cy="50%" r="58%">
+      <stop offset="0%" stop-color="#d9ccff"/>
+      <stop offset="34%" stop-color="#9333EA"/>
+      <stop offset="72%" stop-color="#6D28D9"/>
+      <stop offset="100%" stop-color="#08070D"/>
+    </radialGradient>
+    <radialGradient id="nf-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#C4B5FD" stop-opacity=".72"/>
+      <stop offset="58%" stop-color="#9333EA" stop-opacity=".28"/>
+      <stop offset="100%" stop-color="#9333EA" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="nf-glow" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="3.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <ellipse cx="64" cy="63" rx="36" ry="25" fill="url(#nf-aura)"/>
+  <path d="M64 28 C51 19 34 17 23 22 V94 C34 89 51 91 64 102 C77 91 94 89 105 94 V22 C94 17 77 19 64 28 Z"
+        fill="url(#nf-page)" stroke="url(#nf-edge)" stroke-width="3.4" stroke-linejoin="round"/>
+  <path d="M64 28 V102" stroke="#cfc4ef" stroke-opacity=".82" stroke-width="2.3" stroke-linecap="round"/>
+
+  <path d="M34 35 C43 32 53 33 60 38" fill="none" stroke="#cfc4ef" stroke-opacity=".5" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M34 47 C43 44 53 45 60 50" fill="none" stroke="#cfc4ef" stroke-opacity=".38" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M68 38 C75 33 85 32 94 35" fill="none" stroke="#cfc4ef" stroke-opacity=".5" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M68 50 C75 45 85 44 94 47" fill="none" stroke="#cfc4ef" stroke-opacity=".38" stroke-width="2.2" stroke-linecap="round"/>
+
+  <path d="M42 64 C51 52 77 52 86 64 C77 76 51 76 42 64 Z"
+        fill="#08070D" stroke="#e9e2ff" stroke-width="2.6" stroke-linejoin="round" filter="url(#nf-glow)"/>
+  <circle cx="64" cy="64" r="10.5" fill="url(#nf-eye)" stroke="#ddd0ff" stroke-width="1.8"/>
+  <circle cx="64" cy="64" r="3.4" fill="#030108"/>
+  <circle cx="60.6" cy="60.6" r="2.1" fill="#ffffff" fill-opacity=".9"/>
+
+  <path d="M35 79 C44 76 54 77 60 81" fill="none" stroke="#cfc4ef" stroke-opacity=".42" stroke-width="2" stroke-linecap="round"/>
+  <path d="M68 81 C74 77 84 76 93 79" fill="none" stroke="#cfc4ef" stroke-opacity=".42" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="64" cy="34" r="2.2" fill="#e9e2ff"/>
+  <circle cx="64" cy="96" r="2.2" fill="#e9e2ff"/>
+</svg>
+

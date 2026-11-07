@@ -1,0 +1,16 @@
+{
+  "appId": "com.noteflow.app",
+  "appName": "NoteFlow",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "zoomEnabled": false,
+    "overrideUserAgent": false,
+    "backgroundColor": "#08070d"
+  }
+}

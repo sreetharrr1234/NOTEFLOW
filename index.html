@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NoteFlow — Arise your thoughts</title>
+  <meta name="description" content="NoteFlow is a local-first notes app for web and Android with categories, pinning, favorites, instant search, autosave, and light and dark themes." />
+  <meta name="author" content="NoteFlow" />
+  <meta name="theme-color" id="themeColorMeta" content="#f4f2fb" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="NoteFlow — Arise your thoughts" />
+  <meta property="og:description" content="A premium, local-first notes app built with vanilla HTML, CSS, and JavaScript." />
+  <meta property="og:image" content="assets/images/screenshot-light.png" />
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=1.0.5" />
+
+  <!-- Apply the saved theme before paint to avoid a flash of the wrong theme. -->
+  <script>
+    (function () {
+      try {
+        var saved = JSON.parse(localStorage.getItem('noteflow.settings.v1') || '{}');
+        var mode = saved.theme === 'light' || saved.theme === 'dark' ? saved.theme : 'system';
+        var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        document.querySelector('meta[name="theme-color"]').content = dark ? '#08070d' : '#f4f2fb';
+      } catch (error) {
+        document.documentElement.dataset.theme = 'light';
+      }
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/themes.css?v=1.0.5" />
+  <link rel="stylesheet" href="css/style.css?v=1.0.5" />
+  <link rel="stylesheet" href="css/responsive.css?v=1.0.5" />
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to notes</a>
+
+  <!-- Inline icon sprite keeps the app dependency-free and works from file:// -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-notes" viewBox="0 0 24 24">
+      <path d="M6.5 3.5h8.2L19 7.8v12.7H6.5z" />
+      <path d="M14.5 3.5v4.5H19" />
+      <path d="M9.5 12h6M9.5 15.5h4.5" />
+    </symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24">
+      <path d="m12 3.6 2.5 5.1 5.6.8-4 3.9.9 5.6-5-2.6-5 2.6.9-5.6-4-3.9 5.6-.8Z" />
+    </symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24">
+      <path d="M9 4h6l-1 5 4 3v2H6v-2l4-3-1-5Z" />
+      <path d="M12 14v6" />
+    </symbol>
+    <symbol id="icon-folder" viewBox="0 0 24 24">
+      <path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h5a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z" />
+    </symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14" />
+    </symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m16 16 4.5 4.5" />
+    </symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4" />
+    </symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24">
+      <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" />
+    </symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.3 2.3-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-3.2v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L6 16.9l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H4.6v-3.2h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L6 7.7l2.3-2.3.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6v-.2H14v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 2.3 2.3-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v3.2h-.2a1.7 1.7 0 0 0-1.6 1Z" />
+    </symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24">
+      <path d="M4.5 6.5h15M9 6.5V4h6v2.5M6.5 6.5l.8 13h9.4l.8-13M10 10.5v5M14 10.5v5" />
+    </symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24">
+      <path d="M12 3.5v11M7.5 10.5 12 15l4.5-4.5M4.5 19.5h15" />
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <path d="m5 12.5 4.5 4.5L19 6.5" />
+    </symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24">
+      <path d="m6 6 12 12M18 6 6 18" />
+    </symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </symbol>
+    <symbol id="icon-grid" viewBox="0 0 24 24">
+      <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+      <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+      <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+      <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+    </symbol>
+    <symbol id="icon-list" viewBox="0 0 24 24">
+      <path d="M8.5 6.5H20M8.5 12H20M8.5 17.5H20" />
+      <circle cx="5" cy="6.5" r="1" />
+      <circle cx="5" cy="12" r="1" />
+      <circle cx="5" cy="17.5" r="1" />
+    </symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24">
+      <path d="m6 9.5 6 6 6-6" />
+    </symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24">
+      <path d="M13.5 5.5 18.5 10.5M5 19l1-4.5L16.5 4a2.1 2.1 0 0 1 3 0l.5.5a2.1 2.1 0 0 1 0 3L9.5 18 5 19Z" />
+    </symbol>
+    <symbol id="icon-alert-triangle" viewBox="0 0 24 24">
+      <path d="M10.3 4.6 2.9 17.4A2 2 0 0 0 4.6 20h14.8a2 2 0 0 0 1.7-2.6L13.7 4.6a2 2 0 0 0-3.4 0Z" />
+      <path d="M12 9v4M12 16.5h.01" />
+    </symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 11v5M12 8h.01" />
+    </symbol>
+    <symbol id="icon-sparkles" viewBox="0 0 24 24">
+      <path d="m12 3 1.7 4.5L18 9.2l-4.3 1.7L12 15.4l-1.7-4.5L6 9.2l4.3-1.7L12 3Z" />
+      <path d="m18.5 15.5.5 1.4 1.4.5-1.4.5-.5 1.4-.5-1.4-1.4-.5 1.4-.5.5-1.4Z" />
+    </symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24">
+      <path d="M12 3 5 6v5c0 4.4 3 7.9 7 10 4-2.1 7-5.6 7-10V6l-7-3Z" />
+      <path d="m9 12 2 2 4-4" />
+    </symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </symbol>
+    <symbol id="icon-upload" viewBox="0 0 24 24">
+      <path d="M12 16V4.5M7.5 9 12 4.5 16.5 9M4.5 19.5h15" />
+    </symbol>
+    <symbol id="icon-database" viewBox="0 0 24 24">
+      <ellipse cx="12" cy="5.5" rx="7.5" ry="3" />
+      <path d="M4.5 5.5v13c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-13" />
+      <path d="M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3" />
+    </symbol>
+    <symbol id="icon-keyboard" viewBox="0 0 24 24">
+      <rect x="3" y="6" width="18" height="12" rx="2" />
+      <path d="M7 10h.01M10 10h.01M13 10h.01M16 10h.01M7 13h.01M10 13h.01M13 13h.01M16 13h.01M8 16h8" />
+    </symbol>
+    <symbol id="icon-monitor" viewBox="0 0 24 24">
+      <rect x="3" y="4.5" width="18" height="12.5" rx="2" />
+      <path d="M9 20.5h6M12 17v3.5" />
+    </symbol>
+    <symbol id="icon-tag" viewBox="0 0 24 24">
+      <path d="M20 12.5 12.5 20 4 11.5V4h7.5L20 12.5Z" />
+      <circle cx="8" cy="8" r="1.2" />
+    </symbol>
+  </svg>
+
+  <div class="app" id="app">
+    <!-- ============================= Sidebar ============================= -->
+    <aside class="sidebar" id="sidebar" aria-label="Workspace navigation">
+      <div class="sidebar__brand-row">
+        <button class="brand" type="button" data-action="home" aria-label="NoteFlow home">
+          <span class="brand__mark" aria-hidden="true">
+            <img class="brand__logo" src="assets/icons/app-logo.png?v=1.0.5" alt="" />
+          </span>
+          <span class="brand__text-group">
+            <span class="brand__text">NoteFlow</span>
+            <span class="brand__tagline">Arise your thoughts.</span>
+          </span>
+        </button>
+        <button class="icon-btn sidebar__close" type="button" data-action="close-sidebar" aria-label="Close navigation">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-x"></use></svg>
+        </button>
+      </div>
+
+      <nav class="nav" aria-label="Main navigation">
+        <p class="nav__label">Shadow Monarch</p>
+        <button class="nav-item nav-item--page is-active" type="button" data-page="home">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
+          <span class="nav-item__label">Home</span>
+        </button>
+        <button class="nav-item nav-item--page" type="button" data-page="notes">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-notes"></use></svg>
+          <span class="nav-item__label">My Notes</span>
+          <span class="nav-item__count" data-count="all">0</span>
+        </button>
+        <button class="nav-item nav-item--page" type="button" data-page="quests">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"></use></svg>
+          <span class="nav-item__label">Daily Quests</span>
+          <span class="nav-item__count" id="questsNavCount">0</span>
+        </button>
+        <button class="nav-item nav-item--page" type="button" data-page="archive">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-shield"></use></svg>
+          <span class="nav-item__label">Shadow Archive</span>
+          <span class="nav-item__count" data-count="archive">0</span>
+        </button>
+        <button class="nav-item nav-item--page" type="button" data-page="stats">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-clock"></use></svg>
+          <span class="nav-item__label">Statistics</span>
+        </button>
+      </nav>
+
+      <nav class="nav" aria-label="Note views">
+        <p class="nav__label">Workspace</p>
+        <button class="nav-item" type="button" data-view="all">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-notes"></use></svg>
+          <span class="nav-item__label">All notes</span>
+          <span class="nav-item__count" data-count="all">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="favorites">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-star"></use></svg>
+          <span class="nav-item__label">Favorites</span>
+          <span class="nav-item__count" data-count="favorites">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="pinned">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-pin"></use></svg>
+          <span class="nav-item__label">Pinned</span>
+          <span class="nav-item__count" data-count="pinned">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="archive">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-folder"></use></svg>
+          <span class="nav-item__label">Archived</span>
+          <span class="nav-item__count" data-count="archive">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="trash">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-trash"></use></svg>
+          <span class="nav-item__label">Recently Deleted</span>
+          <span class="nav-item__count" data-count="trash">0</span>
+        </button>
+      </nav>
+
+      <div class="categories">
+        <div class="categories__head">
+          <p class="nav__label">Categories</p>
+          <button class="icon-btn icon-btn--xs" type="button" data-action="open-categories" title="Manage categories" aria-label="Manage categories">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-plus"></use></svg>
+          </button>
+        </div>
+        <div class="category-nav" id="categoryNav"></div>
+      </div>
+
+      <div class="sidebar__footer">
+        <p class="sidebar__meta">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-shield"></use></svg>
+          <span>Stored on this device</span>
+        </p>
+        <button class="theme-row" id="themeToggle" type="button" data-action="toggle-theme" aria-pressed="false">
+          <span class="theme-row__icon" id="themeToggleIcon">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-moon"></use></svg>
+          </span>
+          <span class="theme-row__label">Dark mode</span>
+          <span class="switch" aria-hidden="true"><span class="switch__thumb"></span></span>
+        </button>
+        <button class="nav-item nav-item--settings" type="button" data-action="open-settings">
+          <svg class="icon nav-item__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings"></use></svg>
+          <span class="nav-item__label">Settings</span>
+        </button>
+        <p class="sidebar__version">NoteFlow <span>v1.0</span></p>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
+    <!-- ============================== Main =============================== -->
+    <main class="main" id="mainContent">
+      <header class="topbar">
+        <div class="topbar__left">
+          <button class="icon-btn topbar__menu" id="menuButton" type="button" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-menu"></use></svg>
+          </button>
+          <p class="breadcrumb"><span>Workspace</span><span class="breadcrumb__sep" aria-hidden="true">/</span><strong id="currentViewLabel">All notes</strong></p>
+        </div>
+        <div class="topbar__actions">
+          <button class="btn btn--primary" type="button" data-action="create-note">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-plus"></use></svg>
+            <span>New note</span>
+            <kbd class="btn__kbd" id="newNoteKbd">Ctrl N</kbd>
+          </button>
+        </div>
+      </header>
+
+      <div class="page">
+        <section class="page-head" aria-labelledby="greeting">
+          <p class="page-head__eyebrow" id="todayLabel"></p>
+          <h1 class="page-head__title" id="greeting">Good morning.</h1>
+          <p class="page-head__sub">Arise your thoughts.</p>
+          <div class="page-head__meta">
+            <span id="notesCountLabel">0 notes</span>
+            <span class="meta-dot" aria-hidden="true"></span>
+            <span id="syncLabel">Auto-saved locally</span>
+          </div>
+        </section>
+
+        <section class="page-section dashboard" id="homePage" aria-labelledby="homeTitle">
+          <div class="dashboard__hero shadow-panel">
+            <div>
+              <p class="dashboard__eyebrow">Shadow Monarch</p>
+              <h2 class="dashboard__title" id="homeTitle">Arise, hunter.</h2>
+              <p class="dashboard__sub">Your notes are your army. Capture, organise, and send them forward.</p>
+              <div class="dashboard__actions">
+                <button class="btn btn--primary" type="button" data-action="create-note">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-plus"></use></svg>
+                  <span>Quick Create Note</span>
+                </button>
+                <button class="btn btn--ghost" type="button" data-page="quests">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"></use></svg>
+                  <span>Daily Quests</span>
+                </button>
+              </div>
+            </div>
+            <div class="level-card" aria-label="Hunter level">
+              <span class="level-card__rank" id="homeRank">E Rank</span>
+              <strong class="level-card__level" id="homeLevel">Level 1</strong>
+              <div class="xp-bar" aria-hidden="true"><span id="homeXpBar"></span></div>
+              <p class="level-card__xp" id="homeXpText">0 XP</p>
+              <p class="level-card__streak" id="homeStreak">No streak yet</p>
+            </div>
+          </div>
+
+          <div class="dashboard__grid">
+            <section class="shadow-panel dashboard__panel" aria-labelledby="dailyQuestPreviewTitle">
+              <div class="panel-head">
+                <h3 id="dailyQuestPreviewTitle">Daily Quest</h3>
+                <button class="text-link" type="button" data-page="quests">Open quests</button>
+              </div>
+              <div id="homeQuestPreview"></div>
+            </section>
+
+            <section class="shadow-panel dashboard__panel" aria-labelledby="productivityTitle">
+              <div class="panel-head"><h3 id="productivityTitle">Productivity</h3></div>
+              <div class="stat-grid stat-grid--compact" id="homeProductivity"></div>
+            </section>
+
+            <section class="shadow-panel dashboard__panel" aria-labelledby="folderShortcutsTitle">
+              <div class="panel-head">
+                <h3 id="folderShortcutsTitle">Folders</h3>
+                <button class="text-link" type="button" data-action="open-categories">Manage</button>
+              </div>
+              <div class="folder-shortcuts" id="homeFolderShortcuts"></div>
+            </section>
+
+            <section class="shadow-panel dashboard__panel dashboard__panel--wide" aria-labelledby="pinnedPreviewTitle">
+              <div class="panel-head"><h3 id="pinnedPreviewTitle">Pinned Notes</h3></div>
+              <div id="homePinnedNotes"></div>
+            </section>
+
+            <section class="shadow-panel dashboard__panel dashboard__panel--wide" aria-labelledby="recentPreviewTitle">
+              <div class="panel-head"><h3 id="recentPreviewTitle">Recent Notes</h3></div>
+              <div id="homeRecentNotes"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="page-section quests-page" id="questsPage" aria-labelledby="questsTitle" hidden>
+          <div class="shadow-panel quests-panel">
+            <div class="panel-head panel-head--large">
+              <div>
+                <p class="dashboard__eyebrow">Daily Quest</p>
+                <h2 id="questsTitle">Complete the quest. Earn the XP.</h2>
+              </div>
+              <div class="quest-summary" id="questSummary"></div>
+            </div>
+            <form class="quest-form" id="questForm">
+              <label class="sr-only" for="questTitle">New quest</label>
+              <input class="text-input" id="questTitle" type="text" maxlength="80" placeholder="Add a custom quest…" autocomplete="off" />
+              <label class="sr-only" for="questXp">XP reward</label>
+              <select class="select-wrap select-wrap--sm" id="questXp" aria-label="XP reward">
+                <option value="10">10 XP</option>
+                <option value="20" selected>20 XP</option>
+                <option value="30">30 XP</option>
+                <option value="50">50 XP</option>
+              </select>
+              <button class="btn btn--primary" type="submit">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-plus"></use></svg>
+                <span>Add quest</span>
+              </button>
+            </form>
+            <p class="form-error" id="questError" role="alert" hidden></p>
+            <div class="quest-list" id="questList"></div>
+            <h3 class="section-label">Completed quest history</h3>
+            <div class="quest-history" id="questHistory"></div>
+          </div>
+        </section>
+
+        <section class="page-section stats-page" id="statsPage" aria-labelledby="statsTitle" hidden>
+          <div class="shadow-panel stats-panel">
+            <div class="panel-head panel-head--large">
+              <div>
+                <p class="dashboard__eyebrow">Monarch Statistics</p>
+                <h2 id="statsTitle">Measured from your real notes.</h2>
+              </div>
+            </div>
+            <div id="statsContent"></div>
+          </div>
+        </section>
+
+        <section class="toolbar" aria-label="Search and organize notes">
+          <div class="search" id="searchWrap">
+            <svg class="icon search__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-search"></use></svg>
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Search titles and notes…"
+              autocomplete="off"
+              spellcheck="false"
+              aria-label="Search notes by title and content"
+            />
+            <button class="icon-btn icon-btn--xs search__clear" id="clearSearch" type="button" aria-label="Clear search" hidden>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-x"></use></svg>
+            </button>
+            <kbd class="search__kbd" id="searchKbd">Ctrl K</kbd>
+          </div>
+          <div class="toolbar__right">
+            <div class="select-wrap select-wrap--sort">
+              <label class="sr-only" for="sortSelect">Sort notes</label>
+              <select id="sortSelect">
+                <option value="updated-desc">Last updated</option>
+                <option value="created-desc">Newest first</option>
+                <option value="created-asc">Oldest first</option>
+                <option value="title-asc">Title A–Z</option>
+                <option value="title-desc">Title Z–A</option>
+              </select>
+              <svg class="icon select-wrap__chevron" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
+            </div>
+            <div class="segmented" role="group" aria-label="Note layout">
+              <button type="button" class="segmented__btn" data-view-mode="grid" aria-pressed="true" title="Grid view" aria-label="Grid view">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-grid"></use></svg>
+              </button>
+              <button type="button" class="segmented__btn" data-view-mode="list" aria-pressed="false" title="List view" aria-label="List view">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-list"></use></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="category-bar" aria-label="Filter by category">
+          <div class="chips" id="categoryFilters"></div>
+        </section>
+
+        <section class="results" aria-label="Your notes">
+          <div class="results__head" id="resultsHead"></div>
+          <div class="notes-sections" id="notesContainer"></div>
+        </section>
+
+        <footer class="app-footer">
+          <p>Press <kbd id="footerSearchKbd">Ctrl K</kbd> to search <span aria-hidden="true">·</span> <kbd id="footerNewKbd">Ctrl N</kbd> for a new note</p>
+          <p class="app-footer__brand">Made for focus. No account required.</p>
+        </footer>
+      </div>
+    </main>
+
+    <button class="fab" type="button" data-action="create-note" aria-label="Create a new note">
+      <svg class="icon fab__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-plus"></use></svg>
+      <span>New note</span>
+    </button>
+
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <button class="mobile-nav__item is-active" type="button" data-page="home">
+        <svg class="icon mobile-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
+        <span>Home</span>
+      </button>
+      <button class="mobile-nav__item" type="button" data-page="notes">
+        <svg class="icon mobile-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-notes"></use></svg>
+        <span>Notes</span>
+      </button>
+      <button class="mobile-nav__item" type="button" data-page="quests">
+        <svg class="icon mobile-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"></use></svg>
+        <span>Quests</span>
+      </button>
+      <button class="mobile-nav__item" type="button" data-page="archive">
+        <svg class="icon mobile-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-shield"></use></svg>
+        <span>Archive</span>
+      </button>
+      <button class="mobile-nav__item" type="button" data-page="stats">
+        <svg class="icon mobile-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-clock"></use></svg>
+        <span>Stats</span>
+      </button>
+      <button class="mobile-nav__item" type="button" data-action="open-settings">
+        <svg class="icon mobile-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings"></use></svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ============================== Editor ============================== -->
+  <dialog class="dialog editor" id="editorDialog" aria-labelledby="editorDialogTitle">
+    <h2 class="sr-only" id="editorDialogTitle">Note editor</h2>
+    <div class="editor__shell">
+      <header class="editor__header">
+        <div class="editor__header-left">
+          <button class="icon-btn" type="button" data-editor="close" title="Close editor (Esc)" aria-label="Close editor">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-x"></use></svg>
+          </button>
+          <span class="save-status" id="saveStatus" data-state="saved" role="status" aria-live="polite">
+            <span class="save-status__dot" aria-hidden="true"></span>
+            <span id="saveStatusText">All changes saved</span>
+          </span>
+        </div>
+        <div class="editor__actions">
+          <button class="icon-btn editor-toggle" type="button" data-editor="pin" aria-pressed="false" title="Pin note" aria-label="Pin note">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-pin"></use></svg>
+          </button>
+          <button class="icon-btn editor-toggle" type="button" data-editor="favorite" aria-pressed="false" title="Add to favorites" aria-label="Add to favorites">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-star"></use></svg>
+          </button>
+          <span class="editor__divider" aria-hidden="true"></span>
+          <button class="icon-btn" type="button" data-editor="export" title="Export or share note" aria-label="Export or share note">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download"></use></svg>
+          </button>
+          <button class="icon-btn" type="button" data-editor="archive" title="Archive note" aria-label="Archive note">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-folder"></use></svg>
+          </button>
+          <button class="icon-btn icon-btn--danger" type="button" data-editor="delete" title="Move to Recently Deleted" aria-label="Move note to Recently Deleted">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-trash"></use></svg>
+          </button>
+          <button class="btn btn--primary btn--sm editor__done" type="button" data-editor="done">Done</button>
+        </div>
+      </header>
+
+      <div class="editor__body">
+        <div class="editor__meta">
+          <div class="editor__category">
+            <span class="editor__meta-label">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-folder"></use></svg>
+              Category
+            </span>
+            <div class="select-wrap select-wrap--sm">
+              <label class="sr-only" for="editorCategory">Note category</label>
+              <select id="editorCategory"></select>
+              <svg class="icon select-wrap__chevron" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
+            </div>
+          </div>
+          <p class="editor__dates" id="editorDates"></p>
+        </div>
+
+        <input
+          class="editor__title"
+          id="editorTitle"
+          type="text"
+          maxlength="120"
+          placeholder="Untitled note"
+          autocomplete="off"
+          aria-label="Note title"
+        />
+        <textarea
+          class="editor__content"
+          id="editorContent"
+          placeholder="Start writing. There's no wrong way to begin."
+          aria-label="Note content"
+          spellcheck="true"
+        ></textarea>
+      </div>
+
+      <footer class="editor__footer">
+        <div class="editor__counters">
+          <span id="wordCounter">0 words</span>
+          <span class="meta-dot" aria-hidden="true"></span>
+          <span id="charCounter">0 characters</span>
+        </div>
+        <div class="editor__footer-right">
+          <span class="editor__autosave">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-shield"></use></svg>
+            Auto-save on
+          </span>
+          <kbd id="editorSaveKbd">Ctrl S</kbd>
+        </div>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- ============================ Confirmation ========================== -->
+  <dialog class="dialog dialog--sm confirm" id="confirmDialog" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+    <div class="confirm__body">
+      <div class="confirm__icon" id="confirmIcon" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 24 24"><use href="#icon-alert-triangle"></use></svg>
+      </div>
+      <h2 class="confirm__title" id="confirmTitle">Are you sure?</h2>
+      <p class="confirm__message" id="confirmMessage"></p>
+    </div>
+    <footer class="dialog__footer confirm__footer">
+      <button class="btn btn--ghost" type="button" id="confirmCancel">Cancel</button>
+      <button class="btn btn--danger" type="button" id="confirmAccept">Delete</button>
+    </footer>
+  </dialog>
+
+  <!-- ============================ Categories ============================ -->
+  <dialog class="dialog dialog--md" id="categoriesDialog" aria-labelledby="categoriesTitle">
+    <header class="dialog__header">
+      <div>
+        <p class="dialog__eyebrow">Organize</p>
+        <h2 class="dialog__title" id="categoriesTitle">Categories</h2>
+        <p class="dialog__sub">Give every thought a place. Notes keep their content when a category is removed.</p>
+      </div>
+      <button class="icon-btn" type="button" data-close-dialog aria-label="Close categories">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-x"></use></svg>
+      </button>
+    </header>
+    <div class="dialog__body">
+      <form class="category-form" id="categoryForm" novalidate>
+        <div class="color-field">
+          <span class="form-label">Color</span>
+          <div class="color-options" id="colorOptions" role="group" aria-label="Category color"></div>
+        </div>
+        <div class="category-form__row">
+          <label class="sr-only" for="categoryName">Category name</label>
+          <input class="text-input" id="categoryName" type="text" maxlength="24" placeholder="e.g. Projects, Journal, Travel" autocomplete="off" />
+          <button class="btn btn--primary" type="submit" id="addCategoryBtn">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-plus"></use></svg>
+            Add category
+          </button>
+        </div>
+        <p class="form-error" id="categoryError" role="alert" hidden></p>
+      </form>
+
+      <h3 class="section-label">Your categories</h3>
+      <div class="category-manage" id="categoryManageList"></div>
+    </div>
+    <footer class="dialog__footer">
+      <button class="btn btn--ghost" type="button" data-close-dialog>Done</button>
+    </footer>
+  </dialog>
+
+  <!-- ============================= Settings ============================= -->
+  <dialog class="dialog dialog--md" id="settingsDialog" aria-labelledby="settingsTitle">
+    <header class="dialog__header">
+      <div>
+        <p class="dialog__eyebrow">Preferences</p>
+        <h2 class="dialog__title" id="settingsTitle">Settings</h2>
+        <p class="dialog__sub">Make NoteFlow feel like yours.</p>
+      </div>
+      <button class="icon-btn" type="button" data-close-dialog aria-label="Close settings">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-x"></use></svg>
+      </button>
+    </header>
+    <div class="dialog__body">
+      <section class="settings-section">
+        <h3 class="section-label">Appearance</h3>
+        <p class="section-help">Choose a theme or follow your device.</p>
+        <div class="theme-options" id="themeOptions" role="group" aria-label="Theme">
+          <button class="theme-option" type="button" data-theme-mode="light" aria-pressed="false">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-sun"></use></svg>
+            <span>Light</span>
+          </button>
+          <button class="theme-option" type="button" data-theme-mode="dark" aria-pressed="false">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-moon"></use></svg>
+            <span>Dark</span>
+          </button>
+          <button class="theme-option" type="button" data-theme-mode="system" aria-pressed="false">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-monitor"></use></svg>
+            <span>System</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3 class="section-label">Preferences</h3>
+        <div class="setting-row">
+          <label for="settingsSort">
+            <span class="setting-row__title">Default sort</span>
+            <span class="setting-row__help">Used when you open NoteFlow.</span>
+          </label>
+          <div class="select-wrap select-wrap--sm">
+            <select id="settingsSort">
+              <option value="updated-desc">Last updated</option>
+              <option value="created-desc">Newest first</option>
+              <option value="created-asc">Oldest first</option>
+              <option value="title-asc">Title A–Z</option>
+              <option value="title-desc">Title Z–A</option>
+            </select>
+            <svg class="icon select-wrap__chevron" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3 class="section-label">Your data</h3>
+        <p class="section-help">Everything lives in your browser. Keep a backup before clearing site data.</p>
+        <p class="storage-usage" id="storageUsage">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-database"></use></svg>
+          <span id="storageUsageText">Calculating usage…</span>
+        </p>
+        <div class="settings-actions">
+          <button class="btn btn--ghost" type="button" id="exportBackupBtn">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download"></use></svg>
+            Export backup
+          </button>
+          <button class="btn btn--ghost" type="button" id="importBackupBtn">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-upload"></use></svg>
+            Import backup
+          </button>
+          <button class="btn btn--danger-ghost" type="button" id="clearNotesBtn">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-trash"></use></svg>
+            Move all to trash
+          </button>
+        </div>
+        <input type="file" id="importFile" accept="application/json,.json" hidden />
+      </section>
+
+      <section class="settings-section">
+        <h3 class="section-label">Keyboard shortcuts</h3>
+        <dl class="shortcut-list">
+          <div><dt>Search notes</dt><dd><kbd class="shortcut-kbd" data-shortcut="search">Ctrl K</kbd></dd></div>
+          <div><dt>New note</dt><dd><kbd class="shortcut-kbd" data-shortcut="new">Ctrl N</kbd></dd></div>
+          <div><dt>Save while editing</dt><dd><kbd class="shortcut-kbd" data-shortcut="save">Ctrl S</kbd></dd></div>
+          <div><dt>Close a dialog</dt><dd><kbd>Esc</kbd></dd></div>
+        </dl>
+      </section>
+
+      <section class="settings-section settings-about">
+        <div>
+          <h3 class="section-label">About NoteFlow</h3>
+          <p class="section-help">Version 1.0.4 · Shadow Monarch Edition · Local-first, private by design.</p>
+        </div>
+        <span class="about-mark" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24"><use href="#icon-notes"></use></svg>
+        </span>
+      </section>
+    </div>
+    <footer class="dialog__footer">
+      <button class="btn btn--primary" type="button" data-close-dialog>Done</button>
+    </footer>
+  </dialog>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+
+  <noscript>
+    <div class="noscript">NoteFlow needs JavaScript enabled to create and save your notes.</div>
+  </noscript>
+
+  <script src="assets/vendor/capacitor.js?v=1.0.5" defer></script>
+  <script src="assets/vendor/capacitor-app.js?v=1.0.5" defer></script>
+  <script src="assets/vendor/capacitor-haptics.js?v=1.0.5" defer></script>
+  <script src="assets/vendor/capacitor-share.js?v=1.0.5" defer></script>
+  <script src="assets/vendor/capacitor-status-bar.js?v=1.0.5" defer></script>
+  <script src="js/utils.js?v=1.0.5" defer></script>
+  <script src="js/storage.js?v=1.0.5" defer></script>
+  <script src="js/native.js?v=1.0.5" defer></script>
+  <script src="js/notes.js?v=1.0.5" defer></script>
+  <script src="js/search.js?v=1.0.5" defer></script>
+  <script src="js/filters.js?v=1.0.5" defer></script>
+  <script src="js/editor.js?v=1.0.5" defer></script>
+  <script src="js/gamification.js?v=1.0.5" defer></script>
+  <script src="js/stats.js?v=1.0.5" defer></script>
+  <script src="js/app.js?v=1.0.5" defer></script>
+</body>
+</html>

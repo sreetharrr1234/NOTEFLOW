@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="noteflow_bg">#08070D</color>
+    <color name="noteflow_surface">#110D1B</color>
+    <color name="noteflow_accent">#9333EA</color>
+    <color name="noteflow_accent_dark">#6D28D9</color>
+    <color name="noteflow_highlight">#C4B5FD</color>
+    <color name="noteflow_status_bar">#08070D</color>
+    <color name="noteflow_navigation_bar">#08070D</color>
+</resources>

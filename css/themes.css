@@ -1,0 +1,142 @@
+/* ==========================================================================
+   NoteFlow — themes.css
+   Design tokens for the light and dark themes.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --bg: #f4f2fb;
+  --surface: #ffffff;
+  --surface-2: #f8f7fd;
+  --surface-3: #efedf8;
+  --sidebar: #faf9fd;
+  --overlay: rgba(18, 13, 32, 0.46);
+
+  /* Text */
+  --ink: #17131f;
+  --ink-soft: #383142;
+  --muted: #5d5968;
+  --muted-strong: #494456;
+
+  /* Lines */
+  --border: #e7e2f2;
+  --border-strong: #d5cde7;
+
+  /* Brand */
+  --accent: #9333EA;
+  --accent-hover: #7e22ce;
+  --accent-ink: #ffffff;
+  --accent-soft: #efe9ff;
+  --accent-soft-strong: #ddd0ff;
+
+  /* Feedback */
+  --favorite: #9a6b1e;
+  --favorite-soft: #f7ecd8;
+  --danger: #b1463c;
+  --danger-hover: #963a31;
+  --danger-soft: #f9e9e6;
+  --danger-ink: #ffffff;
+  --success: #2b7a5e;
+  --warning: #9a6b1e;
+
+  /* Chips */
+  --chip-active-bg: #1d1730;
+  --chip-active-ink: #fbfaf6;
+
+  /* Highlights */
+  --mark-bg: #eadfff;
+  --mark-ink: #3f2a6b;
+  --selection: #ddd0ff;
+
+  /* Scrollbar */
+  --scroll-thumb: #d5cde7;
+  --scroll-thumb-hover: #bdb1d8;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(23, 19, 31, 0.04);
+  --shadow-sm: 0 1px 2px rgba(23, 19, 31, 0.04), 0 2px 6px rgba(23, 19, 31, 0.03);
+  --shadow-md: 0 12px 32px -16px rgba(23, 19, 31, 0.22), 0 2px 8px rgba(23, 19, 31, 0.04);
+  --shadow-lg: 0 32px 80px -36px rgba(18, 13, 32, 0.4), 0 8px 24px -12px rgba(18, 13, 32, 0.12);
+  --focus-ring: 0 0 0 3px rgba(109, 40, 217, 0.16);
+
+  /* Row backgrounds */
+  --row-hover: #f0edfa;
+  --card-glow: rgba(109, 40, 217, 0.04);
+
+  /* Metrics */
+  --sidebar-width: 272px;
+  --radius-sm: 8px;
+  --radius-md: 11px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #08070D;
+  --surface: #110D1B;
+  --surface-2: #181322;
+  --surface-3: #211a32;
+  --sidebar: #0d0a16;
+  --overlay: rgba(3, 2, 8, 0.72);
+
+  --ink: #F5F3FF;
+  --ink-soft: #D8D2E8;
+  --muted: #A1A1AA;
+  --muted-strong: #B9B4C9;
+
+  --border: #2A2140;
+  --border-strong: #40345F;
+
+  --accent: #9333EA;
+  --accent-hover: #A855F7;
+  --accent-ink: #FFFFFF;
+  --accent-soft: rgba(147, 51, 234, 0.14);
+  --accent-soft-strong: rgba(147, 51, 234, 0.24);
+
+  --favorite: #E8B15A;
+  --favorite-soft: rgba(232, 177, 90, 0.12);
+  --danger: #F27A7A;
+  --danger-hover: #F5939B;
+  --danger-soft: rgba(242, 122, 122, 0.13);
+  --danger-ink: #2B0D12;
+  --success: #C4B5FD;
+  --warning: #D7A95F;
+
+  --chip-active-bg: #F5F3FF;
+  --chip-active-ink: #08070D;
+
+  --mark-bg: #342B5E;
+  --mark-ink: #E9E2FF;
+  --selection: rgba(147, 51, 234, 0.3);
+
+  --scroll-thumb: #342F47;
+  --scroll-thumb-hover: #4B4465;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
+  --shadow-md: 0 16px 36px -18px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.24);
+  --shadow-lg: 0 36px 90px -34px rgba(0, 0, 0, 0.86), 0 8px 24px -12px rgba(0, 0, 0, 0.42);
+  --focus-ring: 0 0 0 3px rgba(147, 51, 234, 0.24);
+
+  --row-hover: #1D1730;
+  --card-glow: rgba(147, 51, 234, 0.06);
+}
+
+/* Cross-fade theme changes without animating layout. */
+html.theme-changing,
+html.theme-changing *,
+html.theme-changing *::before,
+html.theme-changing *::after {
+  transition-property: background-color, border-color, color, box-shadow, fill, stroke !important;
+  transition-duration: 220ms !important;
+  transition-timing-function: ease !important;
+}
+
+::selection {
+  background: var(--selection);
+  color: var(--ink);
+}
